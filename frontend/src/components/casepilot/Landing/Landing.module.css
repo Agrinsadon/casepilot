@@ -1,0 +1,110 @@
+.landing {
+  min-height: 100vh;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 90px 24px 56px;
+  position: relative;
+  transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (min-width: 860px) {
+  .landing {
+    padding: 85px 64px 96px;
+  }
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  opacity: 0.55;
+  margin-bottom: 28px;
+}
+
+.heading {
+  font-size: clamp(52px, 9vw, 132px);
+  line-height: 0.94;
+  letter-spacing: -0.03em;
+  font-weight: 800;
+  margin: 0 0 40px;
+  max-width: 1100px;
+}
+
+.subhead {
+  font-size: 20px;
+  line-height: 1.5;
+  max-width: 560px;
+  opacity: 0.75;
+  margin: 0 0 56px;
+  font-weight: 400;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.primaryButton {
+  background: var(--color-lime);
+  color: var(--color-ink);
+  border: none;
+  padding: 22px 40px;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+}
+
+.primaryButton:hover {
+  transform: scale(1.03);
+}
+
+.secondaryButton {
+  background: transparent;
+  color: var(--color-paper);
+  border: 1px solid rgba(243, 238, 230, 0.45);
+  padding: 22px 40px;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+
+.secondaryButton:hover {
+  background: rgba(243, 238, 230, 0.08);
+}
+
+.hint {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  opacity: 0.5;
+}
+
+.watermark {
+  display: none;
+  position: absolute;
+  right: 64px;
+  bottom: 80px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  opacity: 0.4;
+}
+
+@media (min-width: 860px) {
+  .watermark {
+    display: block;
+  }
+}

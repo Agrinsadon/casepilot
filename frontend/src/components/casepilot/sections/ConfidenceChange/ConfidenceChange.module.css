@@ -1,0 +1,54 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.compare {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  margin-bottom: 48px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  opacity: 0.5;
+  margin-bottom: 12px;
+}
+
+.before {
+  font-size: clamp(70px, 11vw, 150px);
+  font-weight: 800;
+  line-height: 0.85;
+  opacity: 0.35;
+  letter-spacing: -0.03em;
+}
+
+.arrow {
+  font-size: 48px;
+  opacity: 0.3;
+  padding-bottom: 10px;
+}
+
+.after {
+  font-size: clamp(90px, 15vw, 240px);
+  font-weight: 800;
+  line-height: 0.85;
+  letter-spacing: -0.03em;
+  transition: color 0.4s ease;
+}
+
+.tagline {
+  font-size: clamp(28px, 3.4vw, 44px);
+  letter-spacing: -0.01em;
+  font-weight: 700;
+  margin: 0;
+  max-width: 700px;
+}

@@ -1,0 +1,90 @@
+.section {
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  opacity: 0.5;
+  margin-bottom: 20px;
+}
+
+.heading {
+  font-size: clamp(56px, 9vw, 140px);
+  letter-spacing: -0.03em;
+  font-weight: 800;
+  margin: 0 0 56px;
+  color: var(--color-green);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 64px;
+  max-width: 1200px;
+  margin-bottom: 64px;
+}
+
+@media (min-width: 860px) {
+  .grid {
+    grid-template-columns: 1.1fr 0.9fr;
+  }
+}
+
+.stats {
+  display: flex;
+  gap: 64px;
+  margin-bottom: 48px;
+}
+
+.statLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  opacity: 0.5;
+  margin-bottom: 10px;
+}
+
+.statValue {
+  font-size: 40px;
+  font-weight: 800;
+}
+
+.evidenceLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  opacity: 0.5;
+  margin-bottom: 16px;
+}
+
+.evidenceRow {
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(20, 18, 15, 0.14);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.evidenceLabelText {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.evidenceSource {
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  opacity: 0.6;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  background: none;
+  border: none;
+  color: inherit;
+  padding: 0;
+  transition: opacity 0.2s ease;
+}
+
+.evidenceSource:hover {
+  opacity: 1;
+}

@@ -1,0 +1,46 @@
+.menu {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 32px;
+  padding: 120px 40px 64px;
+  backdrop-filter: blur(10px);
+}
+
+@media (min-width: 860px) {
+  .menu {
+    display: none;
+  }
+}
+
+.ink {
+  background: rgba(20, 18, 15, 0.94);
+  color: var(--color-paper);
+}
+
+.paper {
+  background: rgba(243, 238, 230, 0.94);
+  color: var(--color-ink);
+}
+
+.caseLine {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
+}
+
+.menuLink {
+  font-size: 28px;
+  font-weight: 700;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  padding: 0;
+}

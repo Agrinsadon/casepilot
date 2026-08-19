@@ -1,0 +1,17 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+}
+
+.text {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  letter-spacing: 0.16em;
+  transition: opacity 0.3s ease, color 0.35s ease;
+}

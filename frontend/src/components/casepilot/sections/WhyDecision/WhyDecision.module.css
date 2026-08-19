@@ -1,0 +1,32 @@
+.list {
+  max-width: 700px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.stepLabel {
+  text-align: center;
+  padding: 14px 0;
+}
+
+.stepSub {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  opacity: 0.5;
+  margin-bottom: 6px;
+}
+
+.arrow {
+  font-size: 20px;
+  opacity: 0.3;
+  padding: 4px 0;
+}

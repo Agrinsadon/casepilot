@@ -1,0 +1,125 @@
+.form {
+  min-height: 100vh;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 100px 24px 56px;
+}
+
+@media (min-width: 860px) {
+  .form {
+    padding: 100px 64px 96px;
+  }
+}
+
+.backLink {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--color-ink);
+  opacity: 0.6;
+  padding: 8px 0;
+  margin-bottom: 28px;
+  transition: opacity 0.2s ease;
+}
+
+.backLink:hover {
+  opacity: 1;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  opacity: 0.55;
+  margin-bottom: 20px;
+}
+
+.heading {
+  font-size: clamp(36px, 5vw, 68px);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-weight: 800;
+  margin: 0 0 48px;
+  max-width: 900px;
+}
+
+.fields {
+  max-width: 620px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.fieldLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  opacity: 0.55;
+  margin-bottom: 10px;
+}
+
+.input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--color-ink);
+  padding: 10px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-ink);
+  outline: none;
+}
+
+.textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--color-ink);
+  padding: 10px 0;
+  font-size: 19px;
+  line-height: 1.5;
+  color: var(--color-ink);
+  outline: none;
+  resize: none;
+  font-family: var(--font-sans);
+}
+
+.attachments {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.attachmentChip {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 8px 14px;
+  border: 1px solid rgba(20, 18, 15, 0.3);
+  opacity: 0.7;
+}
+
+.submitButton {
+  margin-top: 56px;
+  align-self: flex-start;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  border: none;
+  padding: 22px 40px;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+}
+
+.submitButton:hover {
+  transform: scale(1.03);
+}

@@ -1,0 +1,108 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.card {
+  max-width: 760px;
+  margin: 0 auto;
+  width: 100%;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--color-lime);
+  margin-bottom: 28px;
+}
+
+.headerBlock {
+  border-top: 1px solid rgba(243, 238, 230, 0.2);
+  border-bottom: 1px solid rgba(243, 238, 230, 0.2);
+  padding: 28px 0;
+  margin-bottom: 28px;
+}
+
+.headerRow {
+  display: flex;
+  gap: 20px;
+  font-size: 15px;
+  margin-bottom: 12px;
+}
+
+.headerRow:last-child {
+  margin-bottom: 0;
+}
+
+.headerKey {
+  opacity: 0.5;
+  min-width: 70px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  padding-top: 2px;
+}
+
+.headerVal {
+  font-weight: 600;
+}
+
+.body {
+  font-size: 19px;
+  line-height: 1.7;
+  opacity: 0.85;
+  margin: 0 0 40px;
+}
+
+.approvalTag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--color-orange);
+  margin-bottom: 28px;
+}
+
+.actions {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.editLink {
+  opacity: 0.6;
+  font-size: 14px;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  background: none;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  padding: 0;
+  transition: opacity 0.2s ease;
+}
+
+.editLink:hover {
+  opacity: 1;
+}
+
+.approveButton {
+  border: none;
+  padding: 20px 36px;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.25s ease;
+}
+
+.approveButton:not(:disabled):hover {
+  transform: scale(1.03);
+}
+
+.approveButton:disabled {
+  cursor: default;
+}

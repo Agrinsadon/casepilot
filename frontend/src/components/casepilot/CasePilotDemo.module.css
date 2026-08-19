@@ -1,0 +1,7 @@
+.root {
+  font-family: var(--font-sans);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  overflow-x: hidden;
+  min-height: 100vh;
+}

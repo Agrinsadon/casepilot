@@ -1,0 +1,74 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--color-orange);
+  margin-bottom: 20px;
+}
+
+.heading {
+  font-size: clamp(38px, 5vw, 72px);
+  letter-spacing: -0.02em;
+  font-weight: 800;
+  margin: 0 0 24px;
+  max-width: 900px;
+}
+
+.body {
+  font-size: 19px;
+  line-height: 1.6;
+  max-width: 640px;
+  opacity: 0.7;
+  margin: 0 0 72px;
+}
+
+.stats {
+  display: flex;
+  align-items: flex-end;
+  gap: 64px;
+  flex-wrap: wrap;
+}
+
+.statLabel {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  opacity: 0.5;
+  margin-bottom: 12px;
+}
+
+.confidenceValue {
+  font-size: clamp(90px, 14vw, 220px);
+  font-weight: 800;
+  line-height: 0.85;
+  color: var(--color-orange);
+  letter-spacing: -0.03em;
+}
+
+.thresholdColumn {
+  padding-bottom: 24px;
+}
+
+.thresholdValue {
+  font-size: 44px;
+  font-weight: 700;
+  opacity: 0.55;
+}
+
+.badge {
+  margin-top: 56px;
+  display: inline-flex;
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  padding: 14px 24px;
+  border: 1px solid var(--color-orange);
+  color: var(--color-orange);
+}

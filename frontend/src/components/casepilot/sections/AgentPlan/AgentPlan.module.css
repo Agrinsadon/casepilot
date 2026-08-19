@@ -1,0 +1,31 @@
+.list {
+  max-width: 920px;
+}
+
+.row {
+  display: flex;
+  gap: 32px;
+  align-items: baseline;
+  padding: 22px 0;
+  border-bottom: 1px solid rgba(243, 238, 230, 0.14);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.index {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  opacity: 0.4;
+  min-width: 44px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.desc {
+  font-size: 15px;
+  opacity: 0.6;
+  font-weight: 400;
+}

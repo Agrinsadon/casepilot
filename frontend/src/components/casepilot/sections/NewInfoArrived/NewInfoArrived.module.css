@@ -1,0 +1,68 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.card {
+  max-width: 680px;
+  transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1), transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 20px;
+}
+
+.sender {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.timestamp {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  opacity: 0.45;
+}
+
+.message {
+  font-size: 24px;
+  line-height: 1.5;
+  font-weight: 500;
+  border-left: 2px solid var(--color-ink);
+  padding-left: 28px;
+  margin: 0 0 48px;
+}
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.pulseDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-lime);
+  animation: pulseDot 1.4s ease-in-out infinite;
+}
+
+@keyframes pulseDot {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.statusLabel {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+}
