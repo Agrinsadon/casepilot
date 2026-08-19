@@ -9,11 +9,27 @@ import {
   DEFAULT_INCIDENT_TYPE,
   INVESTIGATION_ROWS,
 } from "@/data/casePilotContent";
+import { followUp as apiFollowUp, investigate as apiInvestigate } from "@/lib/api";
 import type { ApprovalStatus, EvidenceItem, Phase, SectionKey } from "@/types/casepilot";
+import type { CaseContext, CoverageAssessment } from "@/types/investigation";
 
 const REVEAL_KEYS: SectionKey[] = ["plan", "missing", "next", "review", "recommendation", "trace", "final"];
 
 const STORAGE_KEY = "casepilot-demo-state-v1";
+
+type FollowUpStatus = "idle" | "sending" | "sent";
+
+interface CustomCaseState {
+  context: CaseContext;
+  assessment: CoverageAssessment;
+  priorConfidence: number | null;
+  followUpAnswer: string;
+  followUpStatus: FollowUpStatus;
+  followUpError: string | null;
+  followUpRounds: number;
+}
+
+export const MAX_FOLLOWUP_ROUNDS = 4;
 
 interface CasePilotState {
   phase: Phase;
@@ -36,6 +52,9 @@ interface CasePilotState {
   customerMessage: string;
   caseIncidentType: string;
   revealed: Partial<Record<SectionKey, boolean>>;
+  analyzing: boolean;
+  analysisError: string | null;
+  custom: CustomCaseState | null;
 }
 
 const initialState: CasePilotState = {
@@ -59,21 +78,30 @@ const initialState: CasePilotState = {
   customerMessage: DEFAULT_CUSTOMER_MESSAGE,
   caseIncidentType: DEFAULT_INCIDENT_TYPE,
   revealed: {},
+  analyzing: false,
+  analysisError: null,
+  custom: null,
 };
 
 function sanitizeRestoredState(saved: Partial<CasePilotState>): CasePilotState {
   const merged: CasePilotState = { ...initialState, ...saved };
 
-  // Never resume mid-flight, purely transient UI states.
   if (merged.phase === "transitioning") merged.phase = "app";
   merged.overlayStage = 0;
   merged.mobileMenuOpen = false;
   merged.activeSource = null;
 
-  // Replay staggered reveals that were interrupted instead of freezing them mid-animation.
   if (merged.investigationRevealed < INVESTIGATION_ROWS.length) merged.investigationRevealed = 0;
   if (!merged.confidenceDone) merged.confidenceValue = 78;
   if (merged.approvalStatus === "sending") merged.approvalStatus = "draft";
+
+  merged.analyzing = false;
+  if (merged.custom) {
+    merged.custom = { ...merged.custom, followUpRounds: merged.custom.followUpRounds ?? 0 };
+    if (merged.custom.followUpStatus === "sending") {
+      merged.custom = { ...merged.custom, followUpStatus: "idle" };
+    }
+  }
 
   return merged;
 }
@@ -85,11 +113,6 @@ export function useCasePilotDemo() {
     stateRef.current = state;
   }, [state]);
 
-  // Restore progress after a refresh (client-only, runs once after the initial SSR-safe render).
-  // `hasHydrated` is real state (not a ref) so the save effect below only starts writing once a
-  // render has actually committed the restored value — otherwise, under React StrictMode's dev-only
-  // double-invocation of effects, the save effect can fire with the pre-restore `initialState` and
-  // permanently clobber the saved progress before the restore ever takes effect.
   const [hasHydrated, setHasHydrated] = useState(false);
   const restoreAttemptedRef = useRef(false);
 
@@ -103,12 +126,9 @@ export function useCasePilotDemo() {
       const raw = sessionStorage.getItem(STORAGE_KEY);
       if (raw) {
         const saved = JSON.parse(raw) as Partial<CasePilotState>;
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setState(sanitizeRestoredState(saved));
       }
-    } catch {
-      // Corrupt or inaccessible storage — fall back to the default landing state.
-    } finally {
+    } catch {} finally {
       setHasHydrated(true);
     }
   }, []);
@@ -117,9 +137,7 @@ export function useCasePilotDemo() {
     if (!hasHydrated) return;
     try {
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch {
-      // Storage unavailable (private browsing, quota) — progress just won't persist.
-    }
+    } catch {}
   }, [state, hasHydrated]);
 
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -194,15 +212,106 @@ export function useCasePilotDemo() {
     setState({ ...initialState, phase: "tryForm" });
   }, [clearTimers]);
 
-  const submitTry = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      customerName: prev.formName.trim() || DEFAULT_CUSTOMER_NAME,
-      caseIncidentType: prev.formIncident.trim() || DEFAULT_INCIDENT_TYPE,
-      customerMessage: prev.formMessage.trim() || DEFAULT_CUSTOMER_MESSAGE,
-    }));
-    runCase();
-  }, [runCase]);
+  const submitTry = useCallback(
+    async (policyFile: File | null, images: File[]) => {
+      if (stateRef.current.analyzing) return;
+      const { formName, formIncident, formMessage } = stateRef.current;
+      const description = formMessage.trim();
+      if (!description) return;
+
+      setState((prev) => ({ ...prev, analyzing: true, analysisError: null }));
+
+      try {
+        const result = await apiInvestigate({ description, policyFile, images });
+        setState((prev) => ({
+          ...prev,
+          analyzing: false,
+          customerName: formName.trim() || "You",
+          caseIncidentType: formIncident.trim() || result.assessment.incident_type,
+          customerMessage: description,
+          custom: {
+            context: result.context,
+            assessment: result.assessment,
+            priorConfidence: null,
+            followUpAnswer: "",
+            followUpStatus: "idle",
+            followUpError: null,
+            followUpRounds: 0,
+          },
+        }));
+        runCase();
+      } catch (err) {
+        setState((prev) => ({
+          ...prev,
+          analyzing: false,
+          analysisError: err instanceof Error ? err.message : "Something went wrong. Please try again.",
+        }));
+      }
+    },
+    [runCase]
+  );
+
+  const onFollowUpAnswerChange = useCallback(
+    (value: string) =>
+      setState((prev) => (prev.custom ? { ...prev, custom: { ...prev.custom, followUpAnswer: value } } : prev)),
+    []
+  );
+
+  const submitFollowUp = useCallback(
+    async (policyFile: File | null, images: File[]) => {
+      const custom = stateRef.current.custom;
+      if (!custom || custom.followUpStatus !== "idle") return;
+      const answer = custom.followUpAnswer.trim();
+      if (!answer) return;
+
+      setState((prev) =>
+        prev.custom ? { ...prev, custom: { ...prev.custom, followUpStatus: "sending", followUpError: null } } : prev
+      );
+
+      try {
+        const result = await apiFollowUp({
+          context: custom.context,
+          priorAssessment: custom.assessment,
+          answer,
+          policyFile,
+          images,
+        });
+        const rounds = custom.followUpRounds + 1;
+        const stillMissing = result.assessment.missing_information.length > 0 && rounds < MAX_FOLLOWUP_ROUNDS;
+        setState((prev) =>
+          prev.custom
+            ? {
+                ...prev,
+                custom: {
+                  context: result.context,
+                  assessment: result.assessment,
+                  priorConfidence: prev.custom.priorConfidence ?? custom.assessment.confidence,
+                  followUpAnswer: "",
+                  followUpStatus: stillMissing ? "idle" : "sent",
+                  followUpError: null,
+                  followUpRounds: rounds,
+                },
+              }
+            : prev
+        );
+        if (!stillMissing) addTimer(() => scrollToKey("confidence"), 400);
+      } catch (err) {
+        setState((prev) =>
+          prev.custom
+            ? {
+                ...prev,
+                custom: {
+                  ...prev.custom,
+                  followUpStatus: "idle",
+                  followUpError: err instanceof Error ? err.message : "Something went wrong. Please try again.",
+                },
+              }
+            : prev
+        );
+      }
+    },
+    [addTimer, scrollToKey]
+  );
 
   const resetAll = useCallback(() => {
     clearTimers();
@@ -263,6 +372,7 @@ export function useCasePilotDemo() {
 
   return {
     state,
+    hasHydrated,
     scrollPct,
     registerSection,
     scrollToKey,
@@ -285,6 +395,8 @@ export function useCasePilotDemo() {
       onFormNameChange,
       onFormIncidentChange,
       onFormMessageChange,
+      onFollowUpAnswerChange,
+      submitFollowUp,
     },
   };
 }

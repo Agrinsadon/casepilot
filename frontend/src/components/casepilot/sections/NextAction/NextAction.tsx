@@ -6,9 +6,23 @@ interface NextActionProps {
   sectionRef: (el: HTMLDivElement | null) => void;
   revealed: boolean;
   onReviewRequest: () => void;
+  requiredTitle?: string;
+  requiredDesc?: string;
+  nextActionTitle?: string;
+  nextActionDesc?: string;
+  reviewLabel?: string;
 }
 
-export function NextAction({ sectionRef, revealed, onReviewRequest }: NextActionProps) {
+export function NextAction({
+  sectionRef,
+  revealed,
+  onReviewRequest,
+  requiredTitle = "Leak start time",
+  requiredDesc = "Confirmation from repair company",
+  nextActionTitle = "Request additional information",
+  nextActionDesc = "from repair company",
+  reviewLabel = "REVIEW REQUEST →",
+}: NextActionProps) {
   return (
     <div
       ref={sectionRef}
@@ -20,17 +34,17 @@ export function NextAction({ sectionRef, revealed, onReviewRequest }: NextAction
       <div className={styles.grid}>
         <div>
           <div className={styles.label}>REQUIRED EVIDENCE</div>
-          <div className={styles.itemTitle}>Leak start time</div>
-          <div className={styles.itemDesc}>Confirmation from repair company</div>
+          <div className={styles.itemTitle}>{requiredTitle}</div>
+          <div className={styles.itemDesc}>{requiredDesc}</div>
         </div>
         <div>
           <div className={styles.labelAccent}>NEXT ACTION</div>
-          <div className={styles.itemTitle}>Request additional information</div>
-          <div className={styles.itemDesc}>from repair company</div>
+          <div className={styles.itemTitle}>{nextActionTitle}</div>
+          <div className={styles.itemDesc}>{nextActionDesc}</div>
         </div>
       </div>
       <button type="button" className={shared.primaryButton} onClick={onReviewRequest}>
-        REVIEW REQUEST →
+        {reviewLabel}
       </button>
     </div>
   );

@@ -2,10 +2,6 @@
 
 import { useCallback, useEffect, useRef } from "react";
 
-/**
- * Tracks scroll-triggered section entry via IntersectionObserver and exposes
- * a ref-registration callback plus a smooth-scroll-to-section helper.
- */
 export function useSectionObserver<K extends string>(onEnter: (key: K) => void) {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const elementsRef = useRef<Map<K, HTMLDivElement>>(new Map());

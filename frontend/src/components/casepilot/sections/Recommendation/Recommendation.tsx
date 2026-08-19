@@ -1,4 +1,3 @@
-import { EVIDENCE } from "@/data/casePilotContent";
 import type { EvidenceItem } from "@/types/casepilot";
 import { cx } from "@/utils/cx";
 import shared from "../shared/sectionShared.module.css";
@@ -10,6 +9,12 @@ interface RecommendationProps {
   sourcePanelOpen: boolean;
   onEvidenceClick: (item: EvidenceItem) => void;
   onWhyDecision: () => void;
+  evidence: EvidenceItem[];
+  heading?: string;
+  headingColor?: string;
+  estimatedCompensation?: string;
+  confidenceValue?: number;
+  confidenceColor?: string;
 }
 
 export function Recommendation({
@@ -18,6 +23,12 @@ export function Recommendation({
   sourcePanelOpen,
   onEvidenceClick,
   onWhyDecision,
+  evidence,
+  heading = "APPROVE CLAIM",
+  headingColor = "var(--color-green)",
+  estimatedCompensation = "€3,850",
+  confidenceValue = 94,
+  confidenceColor = "var(--color-green)",
 }: RecommendationProps) {
   return (
     <div
@@ -27,18 +38,20 @@ export function Recommendation({
       style={{ transform: sourcePanelOpen ? "scale(0.97)" : "scale(1)" }}
     >
       <div className={styles.eyebrow}>RECOMMENDATION</div>
-      <h2 className={styles.heading}>APPROVE CLAIM</h2>
+      <h2 className={styles.heading} style={{ color: headingColor }}>
+        {heading}
+      </h2>
       <div className={styles.grid}>
         <div>
           <div className={styles.stats}>
             <div>
               <div className={styles.statLabel}>ESTIMATED COMPENSATION</div>
-              <div className={styles.statValue}>€3,850</div>
+              <div className={styles.statValue}>{estimatedCompensation}</div>
             </div>
             <div>
               <div className={styles.statLabel}>CONFIDENCE</div>
-              <div className={styles.statValue} style={{ color: "var(--color-green)" }}>
-                94%
+              <div className={styles.statValue} style={{ color: confidenceColor }}>
+                {confidenceValue}%
               </div>
             </div>
           </div>
@@ -48,9 +61,9 @@ export function Recommendation({
         </div>
         <div>
           <div className={styles.evidenceLabel}>EVIDENCE</div>
-          {EVIDENCE.map((ev, i) => (
+          {evidence.map((ev, i) => (
             <div
-              key={ev.label}
+              key={`${ev.label}-${i}`}
               className={styles.evidenceRow}
               style={{
                 opacity: revealed ? 1 : 0,

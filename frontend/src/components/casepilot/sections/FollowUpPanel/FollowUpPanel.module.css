@@ -1,0 +1,172 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.card {
+  max-width: 760px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--color-lime);
+  margin-bottom: 28px;
+}
+
+.questionBlock {
+  border-top: 1px solid rgba(243, 238, 230, 0.2);
+  border-bottom: 1px solid rgba(243, 238, 230, 0.2);
+  padding: 28px 0;
+  margin-bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.questionRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.questionText {
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.questionReason {
+  font-size: 14px;
+  opacity: 0.6;
+  line-height: 1.5;
+}
+
+.answerLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  opacity: 0.55;
+  margin-bottom: 12px;
+}
+
+.answerInput {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--color-paper);
+  padding: 10px 0;
+  font-size: 19px;
+  line-height: 1.5;
+  color: var(--color-paper);
+  outline: none;
+  resize: none;
+  font-family: var(--font-sans);
+  margin-bottom: 28px;
+}
+
+.answerInput::placeholder {
+  color: var(--color-paper);
+  opacity: 0.35;
+}
+
+.attachLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  opacity: 0.55;
+  margin-bottom: 12px;
+}
+
+.attachments {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.uploadButton {
+  background: transparent;
+  border: 1px dashed rgba(243, 238, 230, 0.4);
+  color: var(--color-paper);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  padding: 10px 16px;
+  transition: opacity 0.2s ease, background 0.2s ease;
+  opacity: 0.75;
+}
+
+.uploadButton:not(:disabled):hover {
+  opacity: 1;
+  background: rgba(243, 238, 230, 0.08);
+}
+
+.uploadButton:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 8px 10px 8px 14px;
+  border: 1px solid rgba(243, 238, 230, 0.3);
+  opacity: 0.85;
+}
+
+.chipRemove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  font-size: 14px;
+  line-height: 1;
+  opacity: 0.6;
+  padding: 0;
+  transition: opacity 0.2s ease;
+}
+
+.chipRemove:hover {
+  opacity: 1;
+}
+
+.error {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-orange);
+  margin-bottom: 20px;
+}
+
+.sendButton {
+  border: none;
+  padding: 20px 36px;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.25s ease;
+}
+
+.sendButton:not(:disabled):hover {
+  transform: scale(1.03);
+}
+
+.sendButton:disabled {
+  cursor: default;
+  opacity: 0.5;
+}

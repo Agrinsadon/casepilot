@@ -1,19 +1,20 @@
-import { INVESTIGATION_ROWS } from "@/data/casePilotContent";
+import type { InvestigationRow } from "@/types/casepilot";
 import { cx } from "@/utils/cx";
 import shared from "../shared/sectionShared.module.css";
 import styles from "./Investigation.module.css";
 
 interface InvestigationProps {
   sectionRef: (el: HTMLDivElement | null) => void;
+  rows: InvestigationRow[];
   revealedCount: number;
 }
 
-export function Investigation({ sectionRef, revealedCount }: InvestigationProps) {
+export function Investigation({ sectionRef, rows, revealedCount }: InvestigationProps) {
   return (
     <div ref={sectionRef} data-key="investigation" className={cx(shared.section, shared.paper)}>
       <h2 className={shared.heading}>Investigating case.</h2>
       <div className={styles.list}>
-        {INVESTIGATION_ROWS.map((row, i) => {
+        {rows.map((row, i) => {
           const isRevealed = i < revealedCount;
           return (
             <div

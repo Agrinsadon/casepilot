@@ -5,9 +5,16 @@ import styles from "./ConfidenceChange.module.css";
 interface ConfidenceChangeProps {
   sectionRef: (el: HTMLDivElement | null) => void;
   confidenceValue: number;
+  beforeValue?: number;
+  afterLabel?: string;
 }
 
-export function ConfidenceChange({ sectionRef, confidenceValue }: ConfidenceChangeProps) {
+export function ConfidenceChange({
+  sectionRef,
+  confidenceValue,
+  beforeValue = 78,
+  afterLabel = "AFTER · LEAK DURATION CONFIRMED",
+}: ConfidenceChangeProps) {
   const color = confidenceValue >= 85 ? "var(--color-lime)" : "var(--color-orange)";
 
   return (
@@ -15,11 +22,11 @@ export function ConfidenceChange({ sectionRef, confidenceValue }: ConfidenceChan
       <div className={styles.compare}>
         <div>
           <div className={styles.label}>BEFORE · MISSING EVIDENCE</div>
-          <div className={styles.before}>78%</div>
+          <div className={styles.before}>{beforeValue}%</div>
         </div>
         <div className={styles.arrow}>→</div>
         <div>
-          <div className={styles.label}>AFTER · LEAK DURATION CONFIRMED</div>
+          <div className={styles.label}>{afterLabel}</div>
           <div className={styles.after} style={{ color }}>
             {confidenceValue}%
           </div>

@@ -1,4 +1,6 @@
-import { TRY_SIM_ATTACHMENTS } from "@/data/casePilotContent";
+"use client";
+
+import { useRef, useState } from "react";
 import styles from "./TryForm.module.css";
 
 interface TryFormProps {
@@ -8,9 +10,13 @@ interface TryFormProps {
   onNameChange: (value: string) => void;
   onIncidentChange: (value: string) => void;
   onMessageChange: (value: string) => void;
-  onSubmit: () => void;
+  onSubmit: (policyFile: File | null, images: File[]) => void;
   onBack: () => void;
+  analyzing: boolean;
+  error: string | null;
 }
+
+const MAX_IMAGES = 4;
 
 export function TryForm({
   name,
@@ -21,7 +27,21 @@ export function TryForm({
   onMessageChange,
   onSubmit,
   onBack,
+  analyzing,
+  error,
 }: TryFormProps) {
+  const [policyFile, setPolicyFile] = useState<File | null>(null);
+  const [images, setImages] = useState<File[]>([]);
+  const policyInputRef = useRef<HTMLInputElement>(null);
+  const imagesInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImagesChange = (fileList: FileList | null) => {
+    if (!fileList) return;
+    setImages((prev) => [...prev, ...Array.from(fileList)].slice(0, MAX_IMAGES));
+  };
+
+  const removeImage = (index: number) => setImages((prev) => prev.filter((_, i) => i !== index));
+
   return (
     <div className={styles.form}>
       <button type="button" className={styles.backLink} onClick={onBack}>
@@ -54,23 +74,84 @@ export function TryForm({
             className={styles.textarea}
             value={message}
             onChange={(e) => onMessageChange(e.target.value)}
-            placeholder="Yesterday I noticed water coming through the kitchen ceiling. The upstairs apartment apparently had a dishwasher leak. I have attached photos and the repair company's initial report."
+            placeholder="Describe your situation in your own words — the AI will read this."
             rows={4}
           />
         </div>
         <div>
-          <div className={styles.fieldLabel}>ATTACHMENTS (SIMULATED)</div>
+          <div className={styles.fieldLabel}>YOUR POLICY DOCUMENT (OPTIONAL)</div>
           <div className={styles.attachments}>
-            {TRY_SIM_ATTACHMENTS.map((a) => (
-              <div key={a} className={styles.attachmentChip}>
-                {a}
+            <input
+              ref={policyInputRef}
+              type="file"
+              accept=".pdf,.txt,image/*"
+              className={styles.hiddenInput}
+              onChange={(e) => setPolicyFile(e.target.files?.[0] ?? null)}
+            />
+            <button type="button" className={styles.uploadButton} onClick={() => policyInputRef.current?.click()}>
+              {policyFile ? "REPLACE FILE" : "UPLOAD POLICY →"}
+            </button>
+            {policyFile && (
+              <div className={styles.attachmentChip}>
+                {policyFile.name}
+                <button
+                  type="button"
+                  className={styles.chipRemove}
+                  onClick={() => {
+                    setPolicyFile(null);
+                    if (policyInputRef.current) policyInputRef.current.value = "";
+                  }}
+                  aria-label="Remove policy document"
+                >
+                  ×
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+        <div>
+          <div className={styles.fieldLabel}>DAMAGE PHOTOS (OPTIONAL, UP TO {MAX_IMAGES})</div>
+          <div className={styles.attachments}>
+            <input
+              ref={imagesInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className={styles.hiddenInput}
+              onChange={(e) => {
+                handleImagesChange(e.target.files);
+                if (imagesInputRef.current) imagesInputRef.current.value = "";
+              }}
+            />
+            {images.length < MAX_IMAGES && (
+              <button type="button" className={styles.uploadButton} onClick={() => imagesInputRef.current?.click()}>
+                ADD PHOTO →
+              </button>
+            )}
+            {images.map((file, i) => (
+              <div key={`${file.name}-${i}`} className={styles.attachmentChip}>
+                {file.name}
+                <button
+                  type="button"
+                  className={styles.chipRemove}
+                  onClick={() => removeImage(i)}
+                  aria-label={`Remove ${file.name}`}
+                >
+                  ×
+                </button>
               </div>
             ))}
           </div>
         </div>
       </div>
-      <button type="button" className={styles.submitButton} onClick={onSubmit}>
-        SUBMIT CLAIM →
+      {error && <div className={styles.errorMessage}>{error}</div>}
+      <button
+        type="button"
+        className={styles.submitButton}
+        onClick={() => onSubmit(policyFile, images)}
+        disabled={analyzing || !message.trim()}
+      >
+        {analyzing ? "ANALYZING…" : "SUBMIT CLAIM →"}
       </button>
     </div>
   );
