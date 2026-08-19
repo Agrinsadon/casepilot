@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    @keyframes pulseDot{0%,100%{opacity:0.35}50%{opacity:1}}
+  </style>
+</helmet>
+
+<div style="font-family:'Archivo',sans-serif;background:#F3EEE6;color:#14120F;overflow-x:hidden;min-height:100vh">
+
+  <!-- NAV -->
+  <sc-if value="{{ !archOpen }}" hint-placeholder-val="{{ true }}">
+    <div style="position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:{{ navPadding }};background:{{ navBg }};color:{{ navFg }};backdrop-filter:blur(6px);transition:background 0.5s ease,color 0.5s ease">
+      <div style="font-size:15px;font-weight:800;letter-spacing:-0.01em">CASEPILOT</div>
+      <sc-if value="{{ showDesktopNav }}" hint-placeholder-val="{{ true }}">
+        <sc-if value="{{ phase }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;align-items:center;gap:10px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.1em">
+            <sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
+              <span style="opacity:0.6">CASE #2026-1842</span>
+              <span style="opacity:0.3">·</span>
+              <span style="font-weight:600;color:{{ statusColor }}">{{ statusLabel }}</span>
+            </sc-if>
+          </div>
+        </sc-if>
+        <div style="display:flex;align-items:center;gap:24px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.1em">
+          <sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
+            <span style="cursor:pointer;opacity:0.7" onClick="{{ onOpenArch }}" style-hover="opacity:1">ARCHITECTURE</span>
+            <span style="cursor:pointer;opacity:0.7" onClick="{{ onExit }}" style-hover="opacity:1">EXIT DEMO ×</span>
+          </sc-if>
+        </div>
+      </sc-if>
+      <sc-if value="{{ showBurger }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ onToggleMobileMenu }}" style="display:flex;flex-direction:column;justify-content:center;gap:6px;cursor:pointer;padding:8px;width:24px;height:24px">
+          <span style="width:24px;height:2px;background:currentColor;transition:transform 0.25s ease;transform:{{ burgerLine1 }};transform-origin:center"></span>
+          <span style="width:24px;height:2px;background:currentColor;transition:transform 0.25s ease;transform:{{ burgerLine3 }};transform-origin:center"></span>
+        </div>
+      </sc-if>
+    </div>
+    <sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
+      <div style="position:fixed;top:{{ progressBarTop }}px;left:0;right:0;height:2px;background:rgba(20,18,15,0.08);z-index:39">
+        <div style="height:100%;width:{{ scrollPct }}%;background:#14120F;transition:width 0.1s linear"></div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ mobileMenuOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="position:fixed;inset:0;z-index:45;background:{{ navBg }};color:{{ navFg }};display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:32px;padding:120px 40px 64px;backdrop-filter:blur(10px)">
+        <sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.1em;opacity:0.6">CASE #2026-1842 · <span style="color:{{ statusColor }}">{{ statusLabel }}</span></div>
+          <span onClick="{{ onOpenArchMobile }}" style="font-size:28px;font-weight:700;cursor:pointer">ARCHITECTURE</span>
+          <span onClick="{{ onExitMobile }}" style="font-size:28px;font-weight:700;cursor:pointer">EXIT DEMO ×</span>
+        </sc-if>
+        <sc-if value="{{ !isApp }}" hint-placeholder-val="{{ true }}">
+          <span onClick="{{ onRunCaseMobile }}" style="font-size:28px;font-weight:700;cursor:pointer">RUN THE CASE →</span>
+          <span onClick="{{ onOpenTryMobile }}" style="font-size:28px;font-weight:700;cursor:pointer">TRY CASEPILOT →</span>
+        </sc-if>
+      </div>
+    </sc-if>
+  </sc-if>
+
+  <!-- TRANSITION OVERLAY -->
+  <sc-if value="{{ overlayVisible }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:{{ overlayBg }};opacity:{{ overlayOpacity }};transition:background 0.35s cubic-bezier(.22,1,.36,1),opacity 0.28s ease">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:20px;letter-spacing:0.16em;color:{{ overlayFg }};opacity:{{ overlayTextOpacity }};transition:opacity 0.3s ease,color 0.35s ease">CASE #2026-1842</div>
+    </div>
+  </sc-if>
+
+  <!-- LANDING -->
+  <sc-if value="{{ showLanding }}" hint-placeholder-val="{{ true }}">
+  <div data-screen-label="Landing" style="min-height:100vh;background:#14120F;color:#F3EEE6;display:flex;flex-direction:column;justify-content:center;padding:{{ heroPadding }};position:relative;opacity:{{ landingOpacity }};transform:{{ landingTransform }};transition:opacity 0.5s ease,transform 0.6s cubic-bezier(.22,1,.36,1)">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.18em;opacity:0.55;margin-bottom:28px">AI CASE INVESTIGATION · PORTFOLIO DEMO</div>
+    <h1 style="font-size:clamp(52px,9vw,132px);line-height:0.94;letter-spacing:-0.03em;font-weight:800;margin:0 0 40px;max-width:1100px">
+      One case.<br/>Six documents.<br/>Three systems.<br/>One decision.
+    </h1>
+    <p style="font-size:20px;line-height:1.5;max-width:560px;opacity:0.75;margin:0 0 56px;font-weight:400">See how an AI agent investigates a complex case without pretending to know what it does not know.</p>
+    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:20px;width:100%">
+      <button onClick="{{ onRunCase }}" style="background:#C6FF3B;color:#14120F;border:none;padding:22px 40px;font-family:'Archivo',sans-serif;font-size:16px;font-weight:700;letter-spacing:0.02em;cursor:pointer;transition:transform 0.25s ease" style-hover="transform:scale(1.03)">RUN THE CASE →</button>
+      <button onClick="{{ onOpenTry }}" style="background:transparent;color:#F3EEE6;border:1px solid rgba(243,238,230,0.45);padding:22px 40px;font-family:'Archivo',sans-serif;font-size:16px;font-weight:700;letter-spacing:0.02em;cursor:pointer;transition:background 0.25s ease" style-hover="background:rgba(243,238,230,0.08)">TRY CASEPILOT →</button>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.08em;opacity:0.5">RUN THE CASE: guided walkthrough · TRY CASEPILOT: submit your own claim</div>
+    <div style="position:absolute;right:64px;bottom:80px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.1em;opacity:0.4;display:none;md-display:block">CASEPILOT</div>
+  </div>
+  </sc-if>
+
+  <!-- TRY CASEPILOT: INTAKE FORM -->
+  <sc-if value="{{ isTryForm }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Try CasePilot intake" style="min-height:100vh;background:#F3EEE6;color:#14120F;display:flex;flex-direction:column;justify-content:center;padding:{{ heroPadding }}">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.18em;opacity:0.55;margin-bottom:20px">SUBMIT A CLAIM · YOU ARE THE CUSTOMER</div>
+    <h2 style="font-size:clamp(36px,5vw,68px);letter-spacing:-0.02em;line-height:1;font-weight:800;margin:0 0 48px;max-width:900px">Tell us what happened.</h2>
+    <div style="max-width:620px;display:flex;flex-direction:column;gap:32px">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;opacity:0.55;margin-bottom:10px">YOUR NAME</div>
+        <input value="{{ formName }}" onChange="{{ onFormNameChange }}" placeholder="Laura Virtanen" style="width:100%;background:transparent;border:none;border-bottom:2px solid #14120F;padding:10px 0;font-size:24px;font-weight:600;color:#14120F;outline:none" />
+      </div>
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;opacity:0.55;margin-bottom:10px">INCIDENT TYPE</div>
+        <input value="{{ formIncident }}" onChange="{{ onFormIncidentChange }}" placeholder="Water damage" style="width:100%;background:transparent;border:none;border-bottom:2px solid #14120F;padding:10px 0;font-size:24px;font-weight:600;color:#14120F;outline:none" />
+      </div>
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;opacity:0.55;margin-bottom:10px">DESCRIBE WHAT HAPPENED</div>
+        <textarea value="{{ formMessage }}" onChange="{{ onFormMessageChange }}" placeholder="Yesterday I noticed water coming through the kitchen ceiling. The upstairs apartment apparently had a dishwasher leak. I have attached photos and the repair company's initial report." rows="4" style="width:100%;background:transparent;border:none;border-bottom:2px solid #14120F;padding:10px 0;font-size:19px;line-height:1.5;color:#14120F;outline:none;resize:none;font-family:'Archivo',sans-serif"></textarea>
+      </div>
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;opacity:0.55;margin-bottom:12px">ATTACHMENTS (SIMULATED)</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <sc-for list="{{ trySimAttachments }}" as="a" hint-placeholder-count="4">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;padding:8px 14px;border:1px solid rgba(20,18,15,0.3);opacity:0.7">{{ a }}</div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    <button onClick="{{ onSubmitTry }}" style="margin-top:56px;align-self:flex-start;background:#14120F;color:#F3EEE6;border:none;padding:22px 40px;font-family:'Archivo',sans-serif;font-size:16px;font-weight:700;letter-spacing:0.02em;cursor:pointer;transition:transform 0.25s ease" style-hover="transform:scale(1.03)">SUBMIT CLAIM →</button>
+  </div>
+  </sc-if>
+
+  <!-- APP SECTIONS -->
+  <sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
+  <div style="opacity:1">
+
+    <!-- SCREEN 1: CASE ARRIVES -->
+    <div ref="{{ refCase }}" data-key="case" data-screen-label="Case arrives" style="min-height:100vh;background:#F3EEE6;color:#14120F;padding:{{ sectionPadding }};display:grid;grid-template-columns:{{ twoColGrid }};gap:{{ gridGap }}">
+      <div style="transform:{{ caseMsgTransform }};opacity:{{ caseMsgOpacity }};transition:transform 0.5s cubic-bezier(.22,1,.36,1),opacity 0.5s ease">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.14em;opacity:0.55;margin-bottom:20px">CASE #2026-1842 · RECEIVED 18 AUG 2026 · 14:32</div>
+        <h2 style="font-size:clamp(40px,5.5vw,76px);line-height:0.98;letter-spacing:-0.02em;font-weight:800;margin:0 0 8px">{{ caseIncidentType }}</h2>
+        <div style="font-size:22px;font-weight:500;opacity:0.7;margin-bottom:48px">{{ customerName }}</div>
+        <div style="font-size:28px;line-height:1.5;font-weight:500;max-width:620px;margin-bottom:56px;position:relative;padding-left:28px;border-left:2px solid #14120F">
+          {{ customerMessage }}
+        </div>
+        <button onClick="{{ onInvestigate }}" style="background:#14120F;color:#F3EEE6;border:none;padding:20px 36px;font-family:'Archivo',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.02em;cursor:pointer;transition:transform 0.25s ease" style-hover="transform:scale(1.03)">INVESTIGATE CASE →</button>
+      </div>
+      <div style="transform:{{ caseAttachTransform }};transition:transform 0.5s cubic-bezier(.22,1,.36,1)">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.14em;opacity:0.55;margin-bottom:20px">ATTACHMENTS · 6</div>
+        <sc-for list="{{ attachments }}" as="item" hint-placeholder-count="6">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;padding:18px 0;border-bottom:1px solid rgba(20,18,15,0.14)">
+            <span style="font-size:17px;font-weight:600">{{ item.name }}</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;opacity:0.5">{{ item.meta }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- SCREEN 2: AGENT PLAN -->
+    <div ref="{{ refPlan }}" data-key="plan" data-screen-label="Agent plan" style="min-height:100vh;background:#14120F;color:#F3EEE6;padding:{{ sectionPadding }}">
+      <h2 style="font-size:clamp(36px,4.6vw,64px);letter-spacing:-0.02em;font-weight:800;margin:0 0 72px;max-width:800px">The agent creates a plan.</h2>
+      <div style="max-width:920px">
+        <sc-for list="{{ planSteps }}" as="item" hint-placeholder-count="7">
+          <div style="display:flex;gap:32px;align-items:baseline;padding:22px 0;border-bottom:1px solid rgba(243,238,230,0.14);opacity:{{ item.op }};transform:translateY({{ item.ty }}px);transition:opacity 0.5s ease {{ item.delay }}ms,transform 0.5s ease {{ item.delay }}ms">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:20px;opacity:0.4;min-width:44px">{{ item.n }}</div>
+            <div>
+              <div style="font-size:24px;font-weight:700;margin-bottom:4px">{{ item.title }}</div>
+              <div style="font-size:15px;opacity:0.6;font-weight:400">{{ item.desc }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <button onClick="{{ onExecutePlan }}" style="margin-top:56px;background:#C6FF3B;color:#14120F;border:none;padding:20px 36px;font-family:'Archivo',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.02em;cursor:pointer;transition:transform 0.25s ease" style-hover="transform:scale(1.03)">EXECUTE PLAN →</button>
+    </div>
+
+    <!-- SCREEN 3: INVESTIGATION -->
+    <div ref="{{ refInvestigation }}" data-key="investigation" data-screen-label="Investigation" style="min-height:100vh;background:#F3EEE6;color:#14120F;padding:{{ sectionPaddingTall }}">
+      <h2 style="font-size:clamp(36px,4.6vw,64px);letter-spacing:-0.02em;font-weight:800;margin:0 0 64px">Investigating case.</h2>
+      <div style="max-width:1000px;display:flex;flex-direction:column">
+        <sc-for list="{{ invRows }}" as="row" hint-placeholder-count="5">
+          <div style="padding:32px 0;border-bottom:1px solid rgba(20,18,15,0.14);opacity:{{ row.op }};transform:translateY({{ row.ty }}px);transition:opacity 0.5s ease,transform 0.5s ease">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+              <div style="font-size:22px;font-weight:700">{{ row.title }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;padding:6px 12px;border:1px solid #14120F;opacity:0.75">{{ row.status }}</div>
+            </div>
+            <sc-if value="{{ row.simple }}" hint-placeholder-val="{{ true }}">
+              <div style="font-size:17px;opacity:0.65">{{ row.detail }}</div>
+            </sc-if>
+            <sc-if value="{{ row.hasFields }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:56px;flex-wrap:wrap">
+                <sc-if value="{{ row.label1 }}" hint-placeholder-val="{{ false }}">
+                  <div>
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;opacity:0.5;margin-bottom:6px">{{ row.label1 }}</div>
+                    <div style="font-size:17px;font-weight:500">{{ row.value1 }}</div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ row.label2 }}" hint-placeholder-val="{{ false }}">
+                  <div>
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;opacity:0.5;margin-bottom:6px">{{ row.label2 }}</div>
+                    <div style="font-size:17px;font-weight:500">{{ row.value2 }}</div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ row.label3 }}" hint-placeholder-val="{{ false }}">
+                  <div>
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;opacity:0.5;margin-bottom:6px">{{ row.label3 }}</div>
+                    <div style="font-size:17px;font-weight:500">{{ row.value3 }}</div>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- SCREEN 4: MISSING INFORMATION -->
+    <div ref="{{ refMissing }}" data-key="missing" data-screen-label="Missing information" style="min-height:100vh;background:#14120F;color:#F3EEE6;padding:{{ sectionPadding }};display:flex;flex-direction:column;justify-content:center;opacity:{{ missingOp }};transition:opacity 0.6s ease">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.14em;color:#FF6A3D;margin-bottom:20px">CRITICAL INFORMATION MISSING</div>
+      <h2 style="font-size:clamp(38px,5vw,72px);letter-spacing:-0.02em;font-weight:800;margin:0 0 24px;max-width:900px">The agent does not know enough.</h2>
+      <p style="font-size:19px;line-height:1.6;max-width:640px;opacity:0.7;margin:0 0 72px">The repair report confirms water damage. However the report does not confirm when the dishwasher leak began.</p>
+      <div style="display:flex;align-items:flex-end;gap:64px;flex-wrap:wrap">
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.1em;opacity:0.5;margin-bottom:12px">COVERAGE CONFIDENCE</div>
+          <div style="font-size:clamp(90px,14vw,220px);font-weight:800;line-height:0.85;color:#FF6A3D;letter-spacing:-0.03em">78%</div>
+        </div>
+        <div style="padding-bottom:24px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.1em;opacity:0.5;margin-bottom:12px">AUTOMATIC RECOMMENDATION THRESHOLD</div>
+          <div style="font-size:44px;font-weight:700;opacity:0.55">85%</div>
+        </div>
+      </div>
+      <div style="margin-top:56px;display:inline-flex;align-self:flex-start;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:0.12em;padding:14px 24px;border:1px solid #FF6A3D;color:#FF6A3D">NOT ENOUGH EVIDENCE</div>
+    </div>
+
+    <!-- SCREEN 5: WHAT HAPPENS NEXT -->
+    <div ref="{{ refNext }}" data-key="next" data-screen-label="What happens next" style="min-height:100vh;background:#F3EEE6;color:#14120F;padding:{{ sectionPadding }};display:flex;flex-direction:column;justify-content:center;opacity:{{ nextOp }};transition:opacity 0.6s ease">
+      <h2 style="font-size:clamp(38px,5vw,72px);letter-spacing:-0.02em;font-weight:800;margin:0 0 72px;max-width:900px">The agent knows what is missing.</h2>
+      <div style="display:grid;grid-template-columns:{{ twoColGrid }};gap:64px;max-width:1100px;margin-bottom:64px">
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.1em;opacity:0.5;margin-bottom:20px">REQUIRED EVIDENCE</div>
+          <div style="font-size:26px;font-weight:700;margin-bottom:10px">Leak start time</div>
+          <div style="font-size:17px;opacity:0.65">Confirmation from repair company</div>
+        </div>
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.1em;color:#FF6A3D;margin-bottom:20px">NEXT ACTION</div>
+          <div style="font-size:26px;font-weight:700;margin-bottom:10px">Request additional information</div>
+          <div style="font-size:17px;opacity:0.65">from repair company</div>
+        </div>
+      </div>
+      <button onClick="{{ onReviewRequest }}" style="align-self:flex-start;background:#14120F;color:#F3EEE6;border:none;padding:20px 36px;font-family:'Archivo',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.02em;cursor:pointer;transition:transform 0.25s ease" style-hover="transform:scale(1.03)">REVIEW REQUEST →</button>
+    </div>
+
+    <!-- SCREEN 6: HUMAN REVIEW -->
+    <div ref="{{ refReview }}" data-key="review" data-screen-label="Human review" style="min-height:100vh;background:#14120F;color:#F3EEE6;padding:{{ sectionPadding }};display:flex;flex-direction:column;justify-content:center;opacity:{{ reviewOp }};transition:opacity 0.6s ease">
+      <div style="max-width:760px;margin:0 auto;width:100%;transform:{{ reviewMsgTransform }};transition:transform 0.5s cubic-bezier(.22,1,.36,1)">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.12em;color:#C6FF3B;margin-bottom:28px">AI CREATED</div>
+        <div style="border-top:1px solid rgba(243,238,230,0.2);border-bottom:1px solid rgba(243,238,230,0.2);padding:28px 0;margin-bottom:28px">
+          <div style="display:flex;gap:20px;font-size:15px;margin-bottom:12px"><span style="opacity:0.5;min-width:70px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;padding-top:2px">TO</span><span style="font-weight:600">Nordic Repair Oy</span></div>
+          <div style="display:flex;gap:20px;font-size:15px"><span style="opacity:0.5;min-width:70px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;padding-top:2px">SUBJECT</span><span style="font-weight:600">Additional information required — Case #2026-1842</span></div>
+        </div>
+        <p style="font-size:19px;line-height:1.7;opacity:0.85;margin:0 0 40px">Hello,<br/><br/>We are reviewing the water damage reported by Laura Virtanen. Could you confirm the estimated time at which the dishwasher leak began? This information is required to complete the coverage assessment.</p>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.12em;color:#FF6A3D;margin-bottom:28px">HUMAN APPROVAL REQUIRED</div>
+        <div style="display:flex;gap:20px;align-items:center">
+          <span style="opacity:0.6;font-size:14px;cursor:pointer;letter-spacing:0.02em" style-hover="opacity:1">EDIT</span>
+          <button onClick="{{ onApprove }}" disabled="{{ approveDisabled }}" style="background:{{ approveBg }};color:{{ approveFg }};border:none;padding:20px 36px;font-family:'Archivo',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.02em;cursor:pointer;transition:background 0.3s ease,transform 0.25s ease" style-hover="transform:scale(1.03)">{{ approveLabel }}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 7: NEW INFORMATION ARRIVES -->
+    <div ref="{{ refArrived }}" data-key="arrived" data-screen-label="New information arrives" style="min-height:100vh;background:#F3EEE6;color:#14120F;padding:{{ sectionPadding }};display:flex;flex-direction:column;justify-content:center">
+      <h2 style="font-size:clamp(36px,4.6vw,60px);letter-spacing:-0.02em;font-weight:800;margin:0 0 56px">New information received.</h2>
+      <div style="max-width:680px;opacity:{{ arrivedOp }};transform:translateX({{ arrivedTx }}px);transition:opacity 0.55s cubic-bezier(.22,1,.36,1),transform 0.55s cubic-bezier(.22,1,.36,1)">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:20px">
+          <div style="font-size:14px;font-weight:700;letter-spacing:0.02em">Nordic Repair Oy</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;opacity:0.45">JUST NOW</div>
+        </div>
+        <p style="font-size:24px;line-height:1.5;font-weight:500;border-left:2px solid #14120F;padding-left:28px;margin:0 0 48px">The leak appears to have started approximately two hours before it was discovered.</p>
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="width:8px;height:8px;border-radius:50%;background:#C6FF3B;animation:pulseDot 1.4s ease-in-out infinite"></div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.1em">CASE UPDATED — RE-EVALUATING COVERAGE...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 8: CONFIDENCE CHANGE -->
+    <div ref="{{ refConfidence }}" data-key="confidence" data-screen-label="Confidence change" style="min-height:100vh;background:#14120F;color:#F3EEE6;padding:{{ sectionPadding }};display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
+      <div style="display:flex;align-items:center;gap:40px;margin-bottom:48px;flex-wrap:wrap;justify-content:center">
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.1em;opacity:0.5;margin-bottom:12px">BEFORE · MISSING EVIDENCE</div>
+          <div style="font-size:clamp(70px,11vw,150px);font-weight:800;line-height:0.85;opacity:0.35;letter-spacing:-0.03em">78%</div>
+        </div>
+        <div style="font-size:48px;opacity:0.3;padding-bottom:10px">→</div>
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.1em;opacity:0.5;margin-bottom:12px">AFTER · LEAK DURATION CONFIRMED</div>
+          <div style="font-size:clamp(90px,15vw,240px);font-weight:800;line-height:0.85;letter-spacing:-0.03em;color:{{ confColor }};transition:color 0.4s ease">{{ confidenceValue }}%</div>
+        </div>
+      </div>
+      <h2 style="font-size:clamp(28px,3.4vw,44px);letter-spacing:-0.01em;font-weight:700;margin:0;max-width:700px">The evidence changed.<br/>So did the recommendation.</h2>
+    </div>
+
+    <!-- SCREEN 9: RECOMMENDATION -->
+    <div ref="{{ refRecommendation }}" data-key="recommendation" data-screen-label="Recommendation" style="min-height:100vh;background:#F3EEE6;color:#14120F;padding:{{ sectionPadding }};transform:{{ recMainTransform }};transition:transform 0.4s cubic-bezier(.22,1,.36,1)">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.14em;opacity:0.5;margin-bottom:20px">RECOMMENDATION</div>
+      <h2 style="font-size:clamp(56px,9vw,140px);letter-spacing:-0.03em;font-weight:800;margin:0 0 56px;color:#5B8A00">APPROVE CLAIM</h2>
+      <div style="display:grid;grid-template-columns:{{ twoColGrid }};gap:64px;max-width:1200px;margin-bottom:64px">
+        <div>
+          <div style="display:flex;gap:64px;margin-bottom:48px">
+            <div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;opacity:0.5;margin-bottom:10px">ESTIMATED COMPENSATION</div>
+              <div style="font-size:40px;font-weight:800">€3,850</div>
+            </div>
+            <div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;opacity:0.5;margin-bottom:10px">CONFIDENCE</div>
+              <div style="font-size:40px;font-weight:800;color:#5B8A00">94%</div>
+            </div>
+          </div>
+          <button onClick="{{ onWhyDecision }}" style="background:#14120F;color:#F3EEE6;border:none;padding:20px 36px;font-family:'Archivo',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.02em;cursor:pointer;transition:transform 0.25s ease" style-hover="transform:scale(1.03)">WHY THIS DECISION? →</button>
+        </div>
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;opacity:0.5;margin-bottom:16px">EVIDENCE</div>
+          <sc-for list="{{ evidence }}" as="ev" hint-placeholder-count="5">
+            <div style="padding:16px 0;border-bottom:1px solid rgba(20,18,15,0.14);opacity:{{ ev.op }};transform:translateY({{ ev.ty }}px);transition:opacity 0.5s ease {{ ev.delay }}ms,transform 0.5s ease {{ ev.delay }}ms">
+              <div style="font-size:18px;font-weight:600;margin-bottom:6px">{{ ev.label }}</div>
+              <span onClick="{{ ev.onClick }}" style="font-size:13px;text-decoration:underline;text-underline-offset:3px;opacity:0.6;cursor:pointer;font-family:'IBM Plex Mono',monospace" style-hover="opacity:1">{{ ev.sourceLabel }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOURCE PANEL -->
+    <sc-if value="{{ activeSource }}" hint-placeholder-val="{{ false }}">
+      <div style="position:fixed;top:0;right:0;bottom:0;width:min(420px,90vw);background:#14120F;color:#F3EEE6;z-index:60;padding:100px 40px 40px;box-shadow:-20px 0 60px rgba(0,0,0,0.25);transform:translateX({{ sourceTx }}%);transition:transform 0.4s cubic-bezier(.22,1,.36,1);overflow-y:auto">
+        <div onClick="{{ onCloseSource }}" style="position:absolute;top:32px;right:32px;cursor:pointer;font-size:22px;opacity:0.6" style-hover="opacity:1">×</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.1em;opacity:0.5;margin-bottom:8px">{{ activeSourceDoc }}</div>
+        <sc-if value="{{ activeSourcePage }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:14px;opacity:0.6;margin-bottom:32px">Page {{ activeSourcePage }}</div>
+        </sc-if>
+        <p style="font-size:20px;line-height:1.7;background:linear-gradient(180deg,transparent 55%,rgba(198,255,59,0.28) 55%);display:inline">{{ activeSourcePassage }}</p>
+      </div>
+    </sc-if>
+
+    <!-- SCREEN 10: WHY THIS DECISION -->
+    <div ref="{{ refTrace }}" data-key="trace" data-screen-label="Why this decision" style="min-height:100vh;background:#14120F;color:#F3EEE6;padding:{{ sectionPaddingTall }}">
+      <h2 style="font-size:clamp(36px,4.6vw,60px);letter-spacing:-0.02em;font-weight:800;margin:0 0 72px">Why this decision.</h2>
+      <div style="max-width:700px;margin:0 auto;display:flex;flex-direction:column;align-items:center">
+        <sc-for list="{{ traceSteps }}" as="step" hint-placeholder-count="9">
+          <div style="display:flex;flex-direction:column;align-items:center;opacity:{{ step.op }};transform:translateY({{ step.ty }}px);transition:opacity 0.5s ease {{ step.delay }}ms,transform 0.5s ease {{ step.delay }}ms">
+            <div style="font-size:{{ step.size }}px;font-weight:{{ step.weight }};color:{{ step.color }};text-align:center;padding:14px 0">{{ step.label }}</div>
+            <sc-if value="{{ step.sub }}" hint-placeholder-val="{{ false }}">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;opacity:0.5;margin-bottom:6px">{{ step.sub }}</div>
+            </sc-if>
+            <sc-if value="{{ step.hasArrow }}" hint-placeholder-val="{{ true }}">
+              <div style="font-size:20px;opacity:0.3;padding:4px 0">↓</div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- FINAL SCREEN -->
+    <div ref="{{ refFinal }}" data-key="final" data-screen-label="Final" style="min-height:100vh;background:#F3EEE6;color:#14120F;padding:{{ sectionPaddingTall }};display:flex;flex-direction:column;justify-content:center;opacity:{{ finalOp }};transition:opacity 0.6s ease">
+      <h2 style="font-size:clamp(40px,6vw,96px);letter-spacing:-0.03em;line-height:1.02;font-weight:800;margin:0 0 40px;max-width:1000px">AI should not just answer.<br/>It should know what happens next.</h2>
+      <p style="font-size:19px;line-height:1.6;max-width:560px;opacity:0.65;margin:0 0 64px">CasePilot combines AI reasoning, business rules, evidence, and human review inside one auditable workflow.</p>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center">
+        <button onClick="{{ onRunAgain }}" style="background:#14120F;color:#F3EEE6;border:none;padding:20px 36px;font-family:'Archivo',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.02em;cursor:pointer;transition:transform 0.25s ease" style-hover="transform:scale(1.03)">RUN AGAIN</button>
+        <button onClick="{{ onOpenArch }}" style="background:transparent;color:#14120F;border:1px solid #14120F;padding:20px 36px;font-family:'Archivo',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.02em;cursor:pointer;transition:background 0.25s ease" style-hover="background:rgba(20,18,15,0.06)">VIEW ARCHITECTURE</button>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:0.08em;opacity:0.35;padding:20px 8px">GITHUB (COMING SOON)</span>
+      </div>
+    </div>
+
+  </div>
+  </sc-if>
+
+  <!-- ARCHITECTURE OVERLAY -->
+  <sc-if value="{{ archOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:80;background:#14120F;color:#F3EEE6;overflow-y:auto;padding:0 0 120px">
+      <div style="position:sticky;top:0;display:flex;justify-content:space-between;align-items:center;padding:24px 40px;background:rgba(20,18,15,0.95);backdrop-filter:blur(6px);z-index:2">
+        <div style="font-size:15px;font-weight:800">CASEPILOT</div>
+        <span onClick="{{ onCloseArch }}" style="cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.1em;opacity:0.7" style-hover="opacity:1">← BACK TO CASE</span>
+      </div>
+      <div style="max-width:900px;margin:0 auto;padding:80px 40px 0">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.14em;opacity:0.5;margin-bottom:20px">SYSTEM ARCHITECTURE</div>
+        <h2 style="font-size:clamp(32px,4vw,56px);letter-spacing:-0.02em;font-weight:800;margin:0 0 80px">How CasePilot is built.</h2>
+
+        <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:100px">
+          <div style="font-size:22px;font-weight:700;padding:20px 40px;border:1px solid rgba(243,238,230,0.3)">Next.js</div>
+          <div style="font-size:20px;opacity:0.3;padding:8px 0">↓</div>
+          <div style="font-size:22px;font-weight:700;padding:20px 40px;border:1px solid rgba(243,238,230,0.3)">FastAPI</div>
+          <div style="font-size:20px;opacity:0.3;padding:8px 0">↓</div>
+          <div style="font-size:22px;font-weight:700;padding:20px 40px;border:1px solid rgba(243,238,230,0.3)">Case Orchestrator</div>
+          <div style="font-size:20px;opacity:0.3;padding:8px 0">↓</div>
+          <div style="display:grid;grid-template-columns:{{ sysGridCols }};gap:16px;margin-bottom:8px">
+            <div style="font-size:14px;font-weight:600;padding:16px 20px;background:rgba(243,238,230,0.06);text-align:center">Agent Planner</div>
+            <div style="font-size:14px;font-weight:600;padding:16px 20px;background:rgba(243,238,230,0.06);text-align:center">Tool Registry</div>
+            <div style="font-size:14px;font-weight:600;padding:16px 20px;background:rgba(243,238,230,0.06);text-align:center">Policy Engine</div>
+            <div style="font-size:14px;font-weight:600;padding:16px 20px;background:rgba(243,238,230,0.06);text-align:center">Document Retrieval</div>
+            <div style="font-size:14px;font-weight:600;padding:16px 20px;background:rgba(243,238,230,0.06);text-align:center">Audit Service</div>
+          </div>
+          <div style="font-size:20px;opacity:0.3;padding:8px 0">↓</div>
+          <div style="font-size:22px;font-weight:700;padding:20px 40px;border:1px solid rgba(243,238,230,0.3)">PostgreSQL</div>
+        </div>
+
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.14em;opacity:0.5;margin-bottom:20px">THE ACTION BOUNDARY</div>
+        <h3 style="font-size:28px;font-weight:700;margin:0 0 48px">Where the agent must ask before it acts.</h3>
+        <div style="display:flex;flex-direction:column;align-items:center">
+          <div style="font-size:17px;font-weight:600;padding:16px 32px;background:rgba(243,238,230,0.06)">AI Agent</div>
+          <div style="font-size:18px;opacity:0.3;padding:6px 0">↓</div>
+          <div style="font-size:17px;font-weight:600;padding:16px 32px;background:rgba(243,238,230,0.06)">Proposed Action</div>
+          <div style="font-size:18px;opacity:0.3;padding:6px 0">↓</div>
+          <div style="font-size:17px;font-weight:600;padding:16px 32px;background:rgba(243,238,230,0.06)">Validation</div>
+          <div style="font-size:18px;opacity:0.3;padding:6px 0">↓</div>
+          <div style="font-size:17px;font-weight:600;padding:16px 32px;background:rgba(243,238,230,0.06)">Policy Engine</div>
+          <div style="font-size:18px;opacity:0.3;padding:6px 0">↓</div>
+          <div style="font-size:17px;font-weight:700;padding:16px 32px;border:1px solid #8C7AE6;color:#8C7AE6">Human Approval (if required)</div>
+          <div style="font-size:18px;opacity:0.3;padding:6px 0">↓</div>
+          <div style="font-size:17px;font-weight:600;padding:16px 32px;background:rgba(243,238,230,0.06)">Execution</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    phase: 'landing',
+    overlayStage: 0,
+    caseOpened: false,
+    planExecuted: false,
+    planRevealed: false,
+    missingRevealed: false,
+    nextRevealed: false,
+    reviewRevealed: false,
+    recRevealed: false,
+    traceRevealed: false,
+    finalRevealed: false,
+    investigationRevealed: 0,
+    confidenceValue: 78,
+    confidenceDone: false,
+    approvalStatus: 'draft',
+    responseArrived: false,
+    activeSource: null,
+    archOpen: false,
+    activeKey: 'landing',
+    scrollPct: 0,
+    formName: '', formIncident: '', formMessage: '',
+    customerName: 'Laura Virtanen',
+    customerMessage: "Yesterday I noticed water coming through the kitchen ceiling. The upstairs apartment apparently had a dishwasher leak. I have attached photos and the repair company's initial report.",
+    caseIncidentType: 'Water damage',
+    isMobile: false,
+    mobileMenuOpen: false,
+  };
+
+  secRefs = {};
+  timers = [];
+  _refCache = {};
+
+  setRef(key) {
+    if (!this._refCache[key]) this._refCache[key] = (el) => {
+      this.secRefs[key] = el;
+      if (el && this.observer) this.observer.observe(el);
+    };
+    return this._refCache[key];
+  }
+
+  componentDidMount() {
+    this.observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const key = entry.target.getAttribute('data-key');
+          if (key) this.onSectionEnter(key);
+        }
+      });
+    }, { threshold: 0, rootMargin: '0px 0px -35% 0px' });
+    Object.keys(this.secRefs).forEach((k) => {
+      if (this.secRefs[k]) {
+        this.observer.observe(this.secRefs[k]);
+        const r = this.secRefs[k].getBoundingClientRect();
+        if (r.top < window.innerHeight * 0.65) this.onSectionEnter(k);
+      }
+    });
+
+    this._onScroll = () => {
+      const doc = document.documentElement;
+      const max = doc.scrollHeight - window.innerHeight;
+      const pct = max > 0 ? Math.min(100, Math.max(0, (window.scrollY / max) * 100)) : 0;
+      this.setState({ scrollPct: pct });
+    };
+    window.addEventListener('scroll', this._onScroll, { passive: true });
+
+    this._onResize = () => this.setState({ isMobile: window.innerWidth < 860 });
+    this._onResize();
+    window.addEventListener('resize', this._onResize);
+  }
+
+  componentWillUnmount() {
+    if (this.observer) this.observer.disconnect();
+    if (this._onScroll) window.removeEventListener('scroll', this._onScroll);
+    if (this._onResize) window.removeEventListener('resize', this._onResize);
+    this.timers.forEach((t) => clearTimeout(t));
+  }
+
+  onSectionEnter(key) {
+    this.setState({ activeKey: key });
+    if (key === 'investigation' && this.state.investigationRevealed === 0) this.playRows();
+    if (key === 'confidence' && !this.state.confidenceDone && this.state.confidenceValue === 78) this.playConfidence();
+    const revealMap = { plan: 'planRevealed', missing: 'missingRevealed', next: 'nextRevealed', review: 'reviewRevealed', recommendation: 'recRevealed', trace: 'traceRevealed', final: 'finalRevealed' };
+    const flag = revealMap[key];
+    if (flag && !this.state[flag]) this.setState({ [flag]: true });
+  }
+
+  playRows() {
+    for (let i = 1; i <= 5; i++) {
+      this.timers.push(setTimeout(() => this.setState({ investigationRevealed: i }), i * 500));
+    }
+  }
+
+  playConfidence() {
+    const start = performance.now();
+    const dur = 1600;
+    const from = 78, to = 94;
+    const step = (now) => {
+      const p = Math.min(1, (now - start) / dur);
+      const eased = 1 - Math.pow(1 - p, 3);
+      const val = Math.round(from + (to - from) * eased);
+      this.setState({ confidenceValue: val, confidenceDone: p >= 1 });
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  scrollToKey(key) {
+    const el = this.secRefs[key];
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.pageYOffset;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }
+
+  openTry() { this.setState({ phase: 'tryForm' }); }
+
+  submitTry() {
+    const s = this.state;
+    this.setState({
+      customerName: s.formName.trim() || 'Laura Virtanen',
+      caseIncidentType: s.formIncident.trim() || 'Water damage',
+      customerMessage: s.formMessage.trim() || "Yesterday I noticed water coming through the kitchen ceiling. The upstairs apartment apparently had a dishwasher leak. I have attached photos and the repair company's initial report.",
+    });
+    this.runCase();
+  }
+
+  runCase() {
+    this.setState({ phase: 'transitioning', overlayStage: 1 });
+    this.timers.push(setTimeout(() => this.setState({ overlayStage: 2 }), 180));
+    this.timers.push(setTimeout(() => this.setState({ overlayStage: 3 }), 480));
+    this.timers.push(setTimeout(() => {
+      this.setState({ phase: 'app' });
+      requestAnimationFrame(() => requestAnimationFrame(() => this.scrollToKey('case')));
+    }, 760));
+    this.timers.push(setTimeout(() => this.setState({ overlayStage: 0 }), 980));
+  }
+
+  resetAll() {
+    this.timers.forEach((t) => clearTimeout(t));
+    this.timers = [];
+    window.scrollTo({ top: 0, behavior: 'auto' });
+    this.setState({
+      phase: 'landing', overlayStage: 0, caseOpened: false, planExecuted: false,
+      planRevealed: false, missingRevealed: false, nextRevealed: false, reviewRevealed: false,
+      recRevealed: false, traceRevealed: false, finalRevealed: false,
+      investigationRevealed: 0, confidenceValue: 78, confidenceDone: false,
+      approvalStatus: 'draft', responseArrived: false, activeSource: null, archOpen: false, activeKey: 'landing',
+      formName: '', formIncident: '', formMessage: '',
+      customerName: 'Laura Virtanen',
+      customerMessage: "Yesterday I noticed water coming through the kitchen ceiling. The upstairs apartment apparently had a dishwasher leak. I have attached photos and the repair company's initial report.",
+      caseIncidentType: 'Water damage',
+    });
+  }
+
+  handleApprove() {
+    if (this.state.approvalStatus !== 'draft') return;
+    this.setState({ approvalStatus: 'sending' });
+    this.timers.push(setTimeout(() => this.setState({ approvalStatus: 'sent' }), 650));
+    this.timers.push(setTimeout(() => { this.scrollToKey('arrived'); }, 1150));
+    this.timers.push(setTimeout(() => this.setState({ responseArrived: true }), 1550));
+  }
+
+  openSource(item) { this.setState({ activeSource: item }); }
+  closeSource() { this.setState({ activeSource: null }); }
+
+  renderVals() {
+    const s = this.state;
+    const isApp = s.phase === 'app';
+    const isTryForm = s.phase === 'tryForm';
+    const showLanding = !s.archOpen && (s.phase === 'landing' || s.phase === 'transitioning');
+    const isMobile = s.isMobile;
+    const heroPadding = isMobile ? '120px 24px 56px' : '160px 64px 96px';
+    const sectionPadding = isMobile ? '96px 24px 64px' : '140px 64px 100px';
+    const sectionPaddingTall = isMobile ? '96px 24px 80px' : '140px 64px 120px';
+    const navPadding = isMobile ? '16px 20px' : '20px 40px';
+    const twoColGrid = isMobile ? '1fr' : '1.1fr 0.9fr';
+    const gridGap = isMobile ? '48px' : '80px';
+    const sysGridCols = isMobile ? '1fr' : 'repeat(3,1fr)';
+    const progressBarTop = isMobile ? 56 : 64;
+
+    const SECTION_TONE = {
+      landing: 'ink', case: 'paper', plan: 'ink', investigation: 'paper', missing: 'ink',
+      next: 'paper', review: 'ink', arrived: 'paper', confidence: 'ink', recommendation: 'paper',
+      trace: 'ink', final: 'paper',
+    };
+    const tone = SECTION_TONE[s.activeKey] || 'paper';
+    const navBg = tone === 'ink' ? 'rgba(20,18,15,0.94)' : 'rgba(243,238,230,0.94)';
+    const navFg = tone === 'ink' ? '#F3EEE6' : '#14120F';
+
+    const STATUS = {
+      case: { label: 'UNCERTAIN', color: '#8C7AE6' }, plan: { label: 'UNCERTAIN', color: '#8C7AE6' },
+      investigation: { label: 'INVESTIGATING', color: navFg }, missing: { label: 'MISSING EVIDENCE', color: '#FF6A3D' },
+      next: { label: 'MISSING EVIDENCE', color: '#FF6A3D' }, review: { label: 'WAITING FOR HUMAN', color: '#8C7AE6' },
+      arrived: { label: 'NEW INFORMATION', color: '#FF6A3D' }, confidence: { label: 'NEW INFORMATION', color: '#FF6A3D' },
+      recommendation: { label: 'READY FOR RECOMMENDATION', color: '#5B8A00' }, trace: { label: 'READY FOR RECOMMENDATION', color: '#5B8A00' },
+      final: { label: 'READY FOR RECOMMENDATION', color: '#5B8A00' },
+    };
+    const st = STATUS[s.activeKey];
+
+    // overlay
+    const overlayVisible = s.phase === 'transitioning' || s.overlayStage > 0;
+    const overlayBg = s.overlayStage >= 3 ? '#F3EEE6' : '#14120F';
+    const overlayFg = s.overlayStage >= 3 ? '#14120F' : '#F3EEE6';
+    const overlayOpacity = s.overlayStage === 0 ? 0 : 1;
+    const overlayTextOpacity = (s.overlayStage === 2) ? 1 : 0;
+
+    const attachments = [
+      { name: 'customer-message.pdf', meta: 'PDF · 1 page' },
+      { name: 'policy.pdf', meta: 'PDF · 22 pages' },
+      { name: 'damage-photo-01.jpg', meta: 'JPG · 4.1 MB' },
+      { name: 'damage-photo-02.jpg', meta: 'JPG · 3.8 MB' },
+      { name: 'repair-report.pdf', meta: 'PDF · 6 pages' },
+      { name: 'previous-claim.pdf', meta: 'PDF · 3 pages' },
+    ];
+
+    const planRaw = [
+      ['01', 'Identify customer', 'Match claimant identity against policyholder records.'],
+      ['02', 'Read damage report', 'Parse repair company findings and cause of loss.'],
+      ['03', 'Inspect policy', 'Retrieve applicable coverage sections and conditions.'],
+      ['04', 'Search previous claims', 'Check claim history for related or repeat incidents.'],
+      ['05', 'Determine coverage', 'Evaluate damage against policy terms.'],
+      ['06', 'Identify missing evidence', 'Flag information required to reach a confident decision.'],
+      ['07', 'Recommend next action', 'Produce an explainable recommendation or request more evidence.'],
+    ];
+    const planReveal = s.planRevealed || s.planExecuted || s.caseOpened;
+    const planSteps = planRaw.map(([n, title, desc], i) => ({
+      n, title, desc, delay: i * 70,
+      op: planReveal ? 1 : 0, ty: planReveal ? 0 : 16,
+    }));
+
+    const invRaw = [
+      { title: 'Customer lookup', status: 'IDENTITY VERIFIED', simple: true, detail: 'Laura Virtanen' },
+      { title: 'Document analysis', status: 'COMPLETE', simple: true, detail: '6 documents processed' },
+      { title: 'Policy search', status: 'MATCH FOUND', hasFields: true, label1: 'Search query', value1: 'water damage dishwasher leak', label2: 'Relevant section', value2: 'Home Insurance §4.2 — Water damage coverage' },
+      { title: 'Previous claims', status: 'CHECKED', hasFields: true, label1: '2023', value1: 'Storm damage', label2: 'Relationship', value2: 'No relationship detected' },
+      { title: 'Damage assessment', status: 'ASSESSED', hasFields: true, label1: 'Cause', value1: 'Dishwasher leak', label2: 'Estimated damage', value2: '€4,200', label3: 'Coverage', value3: 'Likely covered' },
+    ];
+    const invRows = invRaw.map((r, i) => ({ ...r, op: i < s.investigationRevealed ? 1 : 0, ty: i < s.investigationRevealed ? 0 : 20 }));
+
+    const evidenceRaw = [
+      { label: 'Active policy', sourceLabel: 'policy.pdf · page 14', doc: 'policy.pdf', page: 14, passage: "Sudden and unexpected water damage caused by a household appliance may be covered when reported within policy terms." },
+      { label: 'Covered damage type', sourceLabel: 'policy.pdf · page 14', doc: 'policy.pdf', page: 14, passage: "Sudden and unexpected water damage caused by a household appliance may be covered when reported within policy terms." },
+      { label: 'Repair report', sourceLabel: 'repair-report.pdf · page 3', doc: 'repair-report.pdf', page: 3, passage: "The leak originated from the dishwasher supply line in the upstairs unit and migrated through the ceiling assembly." },
+      { label: 'Leak duration confirmed', sourceLabel: 'repair-company-response', doc: 'repair-company-response', page: null, passage: "The leak appears to have started approximately two hours before it was discovered." },
+      { label: 'Customer identity verified', sourceLabel: 'policy.pdf · page 2', doc: 'policy.pdf', page: 2, passage: "Policyholder: Laura Virtanen — Policy #FI-2291-04, active since 2021." },
+    ];
+    const evidenceReveal = s.recRevealed || s.confidenceDone;
+    const evidence = evidenceRaw.map((e, i) => ({
+      ...e, delay: i * 70, op: evidenceReveal ? 1 : 0, ty: evidenceReveal ? 0 : 16,
+      onClick: () => this.openSource(e),
+    }));
+
+    const traceRaw = [
+      { label: 'Customer message' }, { label: 'Water damage detected' },
+      { label: 'Policy §4.2 retrieved', sub: 'policy.pdf · page 14' }, { label: 'Coverage conditions checked' },
+      { label: 'Missing leak duration detected', color: '#FF6A3D' }, { label: 'Additional information requested' },
+      { label: 'Repair company response received' }, { label: 'Confidence 78% → 94%', size: 40 },
+      { label: 'APPROVE', sub: 'Recommendation', size: 56, weight: 800, color: '#C6FF3B', hasArrow: false },
+    ];
+    const traceReveal = s.traceRevealed || s.recRevealed;
+    const traceSteps = traceRaw.map((t, i) => ({
+      label: t.label, sub: t.sub || '', size: t.size || 22, weight: t.weight || 700,
+      color: t.color || '#F3EEE6', hasArrow: t.hasArrow !== false,
+      delay: i * 90, op: traceReveal ? 1 : 0, ty: traceReveal ? 0 : 14,
+    }));
+
+    const confColor = s.confidenceValue >= 94 ? '#C6FF3B' : (s.confidenceValue >= 85 ? '#C6FF3B' : '#FF6A3D');
+
+    return {
+      phase: s.phase, isApp, archOpen: s.archOpen,
+      navBg, navFg, statusLabel: st ? st.label : '', statusColor: st ? st.color : navFg,
+      scrollPct: s.scrollPct,
+      overlayVisible, overlayBg, overlayFg, overlayOpacity, overlayTextOpacity,
+      landingOpacity: s.phase === 'landing' ? 1 : (s.phase === 'transitioning' ? 0.85 : 0),
+      landingTransform: s.phase === 'landing' ? 'translateY(0)' : 'translateY(-16px)',
+      onRunCase: () => this.runCase(),
+      isTryForm, showLanding, heroPadding, sectionPadding, sectionPaddingTall, navPadding, twoColGrid, gridGap, sysGridCols, progressBarTop,
+      showDesktopNav: !isMobile,
+      showBurger: isMobile && !s.archOpen,
+      mobileMenuOpen: s.mobileMenuOpen,
+      onToggleMobileMenu: () => this.setState({ mobileMenuOpen: !s.mobileMenuOpen }),
+      burgerLine1: s.mobileMenuOpen ? 'translateY(4px) rotate(45deg)' : 'none',
+      burgerLine3: s.mobileMenuOpen ? 'translateY(-4px) rotate(-45deg)' : 'none',
+      onOpenArchMobile: () => this.setState({ archOpen: true, mobileMenuOpen: false }),
+      onExitMobile: () => { this.setState({ mobileMenuOpen: false }); this.resetAll(); },
+      onRunCaseMobile: () => { this.setState({ mobileMenuOpen: false }); this.runCase(); },
+      onOpenTryMobile: () => { this.setState({ mobileMenuOpen: false }); this.openTry(); },
+      onOpenTry: () => this.openTry(),
+      onSubmitTry: () => this.submitTry(),
+      formName: s.formName, formIncident: s.formIncident, formMessage: s.formMessage,
+      onFormNameChange: (e) => this.setState({ formName: e.target.value }),
+      onFormIncidentChange: (e) => this.setState({ formIncident: e.target.value }),
+      onFormMessageChange: (e) => this.setState({ formMessage: e.target.value }),
+      trySimAttachments: ['customer-message.pdf', 'damage-photo-01.jpg', 'repair-report.pdf'],
+      customerName: s.customerName, customerMessage: s.customerMessage, caseIncidentType: s.caseIncidentType,
+      onExit: () => this.resetAll(),
+      onRunAgain: () => this.resetAll(),
+      onOpenArch: () => this.setState({ archOpen: true }),
+      onCloseArch: () => this.setState({ archOpen: false }),
+
+      refCase: this.setRef('case'), refPlan: this.setRef('plan'), refInvestigation: this.setRef('investigation'),
+      refMissing: this.setRef('missing'), refNext: this.setRef('next'), refReview: this.setRef('review'),
+      refArrived: this.setRef('arrived'), refConfidence: this.setRef('confidence'), refRecommendation: this.setRef('recommendation'),
+      refTrace: this.setRef('trace'), refFinal: this.setRef('final'),
+
+      attachments,
+      caseMsgOpacity: s.caseOpened ? 0.55 : 1, caseMsgTransform: s.caseOpened ? 'scale(0.98)' : 'scale(1)',
+      caseAttachTransform: s.caseOpened ? 'translateX(-6px)' : 'translateX(0)',
+      onInvestigate: () => { this.setState({ caseOpened: true }); this.scrollToKey('plan'); },
+
+      planSteps,
+      onExecutePlan: () => { this.setState({ planExecuted: true }); this.scrollToKey('investigation'); },
+
+      invRows,
+
+      missingOp: 1,
+      nextOp: 1,
+      onReviewRequest: () => this.scrollToKey('review'),
+
+      reviewOp: 1,
+      reviewMsgTransform: s.approvalStatus === 'sent' ? 'translateY(-10px)' : 'translateY(0)',
+      approveLabel: s.approvalStatus === 'draft' ? 'APPROVE & SEND →' : (s.approvalStatus === 'sending' ? 'SENDING…' : 'SENT ✓'),
+      approveBg: s.approvalStatus === 'sent' ? '#5B8A00' : '#C6FF3B',
+      approveFg: s.approvalStatus === 'sent' ? '#F3EEE6' : '#14120F',
+      approveDisabled: s.approvalStatus !== 'draft',
+      onApprove: () => this.handleApprove(),
+
+      arrivedOp: 1, arrivedTx: s.responseArrived ? 0 : 12,
+
+      confidenceValue: s.confidenceValue, confColor,
+
+      recMainTransform: s.activeSource ? 'scale(0.97)' : 'scale(1)',
+      evidence,
+      onWhyDecision: () => this.scrollToKey('trace'),
+
+      activeSource: s.activeSource, sourceTx: s.activeSource ? 0 : 100,
+      activeSourceDoc: s.activeSource ? s.activeSource.doc : '',
+      activeSourcePage: s.activeSource ? s.activeSource.page : null,
+      activeSourcePassage: s.activeSource ? s.activeSource.passage : '',
+      onCloseSource: () => this.closeSource(),
+
+      traceSteps,
+      finalOp: 1,
+    };
+  }
+}
+
+</script>
+</body>
+</html>
