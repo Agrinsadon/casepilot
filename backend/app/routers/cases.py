@@ -97,12 +97,15 @@ async def _process_attachments(
         content_type = image.content_type or "application/octet-stream"
         if not _is_image_upload(content_type, image.filename):
             raise HTTPException(status_code=400, detail=f"{image.filename} isn't a supported image type.")
-        summary = _run_ai_step(
-            f"Analyzing photo {index}",
-            lambda content=raw, ct=content_type, i=index: document_extraction.describe_damage_photo(
-                client, settings.openai_model, content, ct, i
-            ),
-        )
+        try:
+            summary = _run_ai_step(
+                f"Analyzing photo {index}",
+                lambda content=raw, ct=content_type, fn=image.filename, i=index: document_extraction.describe_damage_photo(
+                    client, settings.openai_model, content, ct, fn, i
+                ),
+            )
+        except UnsupportedFileError as err:
+            raise HTTPException(status_code=400, detail=str(err))
         image_summaries.append(summary)
         attachment_names.append(image.filename)
 

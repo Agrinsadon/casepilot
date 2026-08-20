@@ -1,9 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DemoPolicyModal } from "@/components/casepilot/DemoPolicyModal/DemoPolicyModal";
 import { createDemoPolicyFile } from "@/lib/demoPolicy";
+import { loadDraftFiles, saveDraftFiles } from "@/lib/fileStorage";
 import styles from "./TryForm.module.css";
+
+const DRAFT_FILES_KEY = "casepilot-tryform-files";
 
 interface TryFormProps {
   name: string;
@@ -37,6 +40,29 @@ export function TryForm({
   const [demoModalOpen, setDemoModalOpen] = useState(false);
   const policyInputRef = useRef<HTMLInputElement>(null);
   const imagesInputRef = useRef<HTMLInputElement>(null);
+  const hadDraftTextOnMountRef = useRef(message.trim().length > 0);
+  const restoreAttemptedRef = useRef(false);
+  const [draftLoaded, setDraftLoaded] = useState(false);
+
+  useEffect(() => {
+    if (restoreAttemptedRef.current) {
+      setDraftLoaded(true);
+      return;
+    }
+    restoreAttemptedRef.current = true;
+    if (hadDraftTextOnMountRef.current) {
+      const draft = loadDraftFiles(DRAFT_FILES_KEY);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      if (draft.policyFile) setPolicyFile(draft.policyFile);
+      if (draft.images.length > 0) setImages(draft.images);
+    }
+    setDraftLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (!draftLoaded) return;
+    saveDraftFiles(DRAFT_FILES_KEY, policyFile, images);
+  }, [policyFile, images, draftLoaded]);
 
   const useDemoPolicy = () => {
     setPolicyFile(createDemoPolicyFile());
