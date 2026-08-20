@@ -1,6 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { DemoPolicyModal } from "@/components/casepilot/DemoPolicyModal/DemoPolicyModal";
+import { createDemoPolicyFile } from "@/lib/demoPolicy";
 import type { MissingInformationItem } from "@/types/investigation";
 import { cx } from "@/utils/cx";
 import shared from "../shared/sectionShared.module.css";
@@ -40,10 +42,16 @@ export function FollowUpPanel({
   const sent = status === "sent";
   const [policyFile, setPolicyFile] = useState<File | null>(null);
   const [images, setImages] = useState<File[]>([]);
+  const [demoModalOpen, setDemoModalOpen] = useState(false);
   const policyInputRef = useRef<HTMLInputElement>(null);
   const imagesInputRef = useRef<HTMLInputElement>(null);
 
   const removeImage = (index: number) => setImages((prev) => prev.filter((_, i) => i !== index));
+
+  const useDemoPolicy = () => {
+    setPolicyFile(createDemoPolicyFile());
+    setDemoModalOpen(false);
+  };
 
   const handleSubmit = () => {
     onSubmit(policyFile, images);
@@ -94,6 +102,14 @@ export function FollowUpPanel({
             disabled={status !== "idle"}
           >
             {policyFile ? "REPLACE POLICY" : "ADD POLICY →"}
+          </button>
+          <button
+            type="button"
+            className={styles.demoButton}
+            onClick={() => setDemoModalOpen(true)}
+            disabled={status !== "idle"}
+          >
+            VIEW DEMO POLICY
           </button>
           {policyFile && (
             <div className={styles.chip}>
@@ -163,6 +179,7 @@ export function FollowUpPanel({
           {SEND_LABEL[status]}
         </button>
       </div>
+      <DemoPolicyModal open={demoModalOpen} onClose={() => setDemoModalOpen(false)} onUse={useDemoPolicy} />
     </div>
   );
 }

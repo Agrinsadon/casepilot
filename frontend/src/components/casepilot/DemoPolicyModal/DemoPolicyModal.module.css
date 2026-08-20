@@ -1,0 +1,82 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(20, 18, 15, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.card {
+  position: relative;
+  width: min(640px, 100%);
+  max-height: 80vh;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  padding: 40px;
+  overflow-y: auto;
+}
+
+.closeButton {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 22px;
+  opacity: 0.6;
+  color: inherit;
+  transition: opacity 0.2s ease;
+}
+
+.closeButton:hover {
+  opacity: 1;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  opacity: 0.55;
+  margin-bottom: 12px;
+}
+
+.heading {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin: 0 0 24px;
+  max-width: 480px;
+}
+
+.body {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  background: rgba(20, 18, 15, 0.04);
+  border: 1px solid rgba(20, 18, 15, 0.12);
+  padding: 24px;
+  margin: 0 0 28px;
+}
+
+.useButton {
+  background: var(--color-ink);
+  color: var(--color-paper);
+  border: none;
+  padding: 18px 32px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+}
+
+.useButton:hover {
+  transform: scale(1.03);
+}

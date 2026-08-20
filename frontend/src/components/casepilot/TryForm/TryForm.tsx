@@ -1,6 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { DemoPolicyModal } from "@/components/casepilot/DemoPolicyModal/DemoPolicyModal";
+import { createDemoPolicyFile } from "@/lib/demoPolicy";
 import styles from "./TryForm.module.css";
 
 interface TryFormProps {
@@ -32,8 +34,14 @@ export function TryForm({
 }: TryFormProps) {
   const [policyFile, setPolicyFile] = useState<File | null>(null);
   const [images, setImages] = useState<File[]>([]);
+  const [demoModalOpen, setDemoModalOpen] = useState(false);
   const policyInputRef = useRef<HTMLInputElement>(null);
   const imagesInputRef = useRef<HTMLInputElement>(null);
+
+  const useDemoPolicy = () => {
+    setPolicyFile(createDemoPolicyFile());
+    setDemoModalOpen(false);
+  };
 
   const handleImagesChange = (fileList: FileList | null) => {
     if (!fileList) return;
@@ -90,6 +98,9 @@ export function TryForm({
             />
             <button type="button" className={styles.uploadButton} onClick={() => policyInputRef.current?.click()}>
               {policyFile ? "REPLACE FILE" : "UPLOAD POLICY →"}
+            </button>
+            <button type="button" className={styles.demoButton} onClick={() => setDemoModalOpen(true)}>
+              VIEW DEMO POLICY
             </button>
             {policyFile && (
               <div className={styles.attachmentChip}>
@@ -153,6 +164,7 @@ export function TryForm({
       >
         {analyzing ? "ANALYZING…" : "SUBMIT CLAIM →"}
       </button>
+      <DemoPolicyModal open={demoModalOpen} onClose={() => setDemoModalOpen(false)} onUse={useDemoPolicy} />
     </div>
   );
 }
