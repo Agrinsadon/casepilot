@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef } from "react";
 export function useSectionObserver<K extends string>(onEnter: (key: K) => void) {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const elementsRef = useRef<Map<K, HTMLDivElement>>(new Map());
+  const refCallbacksRef = useRef<Map<K, (el: HTMLDivElement | null) => void>>(new Map());
   const onEnterRef = useRef(onEnter);
   useEffect(() => {
     onEnterRef.current = onEnter;
@@ -39,8 +40,11 @@ export function useSectionObserver<K extends string>(onEnter: (key: K) => void) 
     };
   }, []);
 
-  const registerSection = useCallback(
-    (key: K) => (el: HTMLDivElement | null) => {
+  const registerSection = useCallback((key: K) => {
+    const cached = refCallbacksRef.current.get(key);
+    if (cached) return cached;
+
+    const callback = (el: HTMLDivElement | null) => {
       const previous = elementsRef.current.get(key);
       if (previous && observerRef.current) observerRef.current.unobserve(previous);
 
@@ -50,9 +54,10 @@ export function useSectionObserver<K extends string>(onEnter: (key: K) => void) 
       } else {
         elementsRef.current.delete(key);
       }
-    },
-    []
-  );
+    };
+    refCallbacksRef.current.set(key, callback);
+    return callback;
+  }, []);
 
   const scrollToKey = useCallback((key: K) => {
     const el = elementsRef.current.get(key);
